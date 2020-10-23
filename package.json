@@ -1,0 +1,30 @@
+{
+  "name": "jonnistore",
+  "version": "1.0.0",
+  "description": "Jonni sin butikk",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gard971/JonniStore.git"
+  },
+  "author": "Gard Søreng (JS)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gard971/JonniStore/issues"
+  },
+  "homepage": "https://github.com/gard971/JonniStore#readme",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "http": "0.0.1-security",
+    "nodemailer": "^6.4.14",
+    "path": "^0.12.7",
+    "paypal-rest-sdk": "^1.8.1",
+    "pdfkit": "^0.11.0",
+    "socket.io": "^2.3.0"
+  }
+}
