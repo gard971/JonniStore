@@ -3,6 +3,12 @@ var saltRounds = 10;
 var emailUsername = ""
 var emailPassword = ""
 
+paypal.configure({
+    "mode": "sandbox", // skiftes til realtime når vi kommer inn i deploment
+    "client_id": "AeY4EnVK7UJ_2AxR66cY_zXDrOAHjZq0TLVqnkpFY6BkwrOvdMXF9sYl44MAPcREP7ccuY-8dUxTB9cn",  //disse to leder til "gard docs" DISSE MÅ ENDRES TIL JONNI SIN PAYPAL
+    "client_secret": "EAqK2uTsxgJVVWD3Gy1JWIWvoDqJVMHf9s9yIWsbsSM-CYNnxGWf19wiAKkoT2CNMmdA9Q4ptNS-iU5G"
+})
+
 //dependecies
 const app = require("express")()
 const express = require("express")
@@ -19,6 +25,102 @@ const paypal = require("paypal-rest-sdk");
 const PDFDocument = require("pdfkit")
 
 var approvedKeys = []
+
+app.post("/newProduct", (req, res) => {   //brukes for opplastning av nye produkt
+    var formData = new formidable.IncomingForm()
+    formData.parse(req, (err, fields, files) => {
+        var extension = files.file.name.substr(files.file.name.lastIndexOf("."))
+        var newPath = "public/images/productPics/" + fields.ProductName.split(" ").join("-") + extension
+        if (fs.existsSync(newPath)) {
+            res.write("Product name allready exists")
+            res.end()
+
+        } else {
+            fs.rename(files.file.path, newPath, function (error) {
+                if (error) {
+                    throw error
+                } else {
+                    res.redirect("/admin.html?fileSent=true")
+                    var newObject = {
+                        "name": fields.ProductName.split(" ").join("-"),
+                        "cost": +fields.cost,
+                        "picFileLoc": newPath
+                    }
+                    var json = jsonRead("data/products.json")
+                    json.push(newObject)
+                    jsonWrite("data/products.json", json)
+                }
+            })
+        }
+    })
+})
+
+app.get("/success", (req, res) => { //paypal betalings prosess
+    if (!req.query.product) {
+        res.send("Missing product name. You have not been charged. Please try again")
+        res.end()
+    }
+    else if(!req.query.email){
+        alert("missing email. You have not been charged!. Please go back to the main page and redoo the whole process")
+    }
+     else {
+        var paymentId
+        var payerId
+        var ammount
+        var execute_payment_json
+        var products = jsonRead("data/products.json")
+        products.forEach(product => {
+            if (product.name == req.query.product) {
+                ammount = product.cost
+            }
+        })
+        if (!ammount) {
+            res.send("somthing went wrong when proccessing your request. You have not been charged")
+            res.end()
+        } else {
+            payerId = req.query.PayerID;
+            paymentId = req.query.paymentId;
+
+            execute_payment_json = {
+                "payer_id": payerId,
+                "transactions": [{
+                    "amount": {
+                        "currency": "USD",
+                        "total": ammount
+                    }
+                }]
+            };
+        }
+        paypal.payment.execute(paymentId, execute_payment_json, function (error, payment) {
+            if (error) {
+                res.send("somthing went wrong when proccessing your request. You have not been charged")
+                res.end()
+            } else {
+                sendMail(req.query.email, `Order confirmation`, `Helo ${req.query.email}, we have recived your order of "${req.query.product}" and we herby confirm that the transaction was succsesfully completed. We will alert you again when we have shipped your item!`)
+                res.redirect("TransactionCompleted.html")
+                res.end()
+                var genInfo = jsonRead("data/genInfo.json")
+                var newObject = {
+                    "orderID":genInfo.nextOrderID,
+                    "Item":req.query.product,
+                    "email":req.query.email,
+                    "shipping":{
+                        "name":payment.payer.payer_info.shipping_address.recipient_name,
+                        "adress": payment.payer.payer_info.shipping_address.line1,
+                        "city":payment.payer.payer_info.shipping_address.city,
+                        "postal":payment.payer.payer_info.shipping_address.postal_code
+                    }
+                }
+                var orders = jsonRead("data/waitingOrders.json")
+                orders.push(newObject)
+                jsonWrite("data/waitingOrders.json", orders)
+                genInfo.nextOrderID++
+                jsonWrite("data/genInfo.json", genInfo)
+                io.sockets.emit("newOrder", newObject)
+            }
+        })
+    }
+})//slutt av betalingsprosess
 
 app.use(express.static(path.join(__dirname, "public")))
 
