@@ -4,8 +4,8 @@ const paypal = require("paypal-rest-sdk");
 //instillinger.
 var port = 3000;
 var saltRounds = 10;
-var emailUsername = ""
-var emailPassword = ""
+var emailUsername = "gardsoreng@gmail.com"
+var emailPassword = "rhactdwiqjqwidos"
 var websiteLink = "http://31.45.73.84"  //Brukes når det blir sendt ut mail om Feks. bekrefting av email. IKKE INKLUDER PORT!! HUSK http://  !!  fin ip på https://whatismyipaddress.com/
 
 paypal.configure({
@@ -130,13 +130,17 @@ app.use(express.static(path.join(__dirname, "public")))
 
 io.on("connection", (socket) => {
     socket.on("login", (username, password, rememberMe) => {
+        console.log(username+" "+password)
         var json = jsonRead("data/users.json")
         if(json){
             var found = false;
             var needConfirm = false
             json.forEach(user => {
+                console.log(user)
+                console.log(user.username == username)
+                console.log(bcrypt.compareSync(password, user.password))
                 if(user.username == username && bcrypt.compareSync(password, user.password) && user.confirmation){
-                    socket.emit("redir", "needConfirm.html")
+                    socket.emit("redir", "AccountCreated.html")
                     needConfirm = true
                 }
                 else if(user.username == username && bcrypt.compareSync(password, user.password)){
@@ -148,10 +152,12 @@ io.on("connection", (socket) => {
                     approvedKeys.push(newObject)
                     found = true
                     socket.emit("passwordCorrect", newObject.username, newObject.key, rememberMe)
+                    console.log("correct")
                 }
             })
             if(!found && !needConfirm){
                 socket.emit("passwordWrong")
+                console.log("wrong")
             }
         }
     })
@@ -186,7 +192,7 @@ io.on("connection", (socket) => {
                 } else {
                     socket.emit("userCreated")
                 }
-                sendMail(newObject.username, "Confirm Email", `hello ${newObject.username} you can confirm you email by pressing this link: ${websiteLink}:${port}/confirm.html?id=${newObject.confirmation.id}`)
+                sendMail(newObject.username, "Confirm Email", `hello ${newObject.username} you can confirm you email by pressing this link: ${websiteLink}:${port}/AccountConfirmed.html?id=${newObject.confirmation.id}`)
             }
         })
     })

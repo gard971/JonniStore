@@ -1,0 +1,26 @@
+.u-section-1 .u-sheet-1 {min-height: 885px}
+.u-section-1 .u-form-1 {height: 188px; width: 570px; margin: 305px auto 0}
+.u-section-1 .u-form-group-1 {width: 100%}
+.u-section-1 .u-form-group-2 {width: 100%}
+.u-section-1 .u-input-2 {margin-top: 0; margin-bottom: 0; height: 54px}
+.u-section-1 .u-form-group-3 {width: 100%}
+.u-section-1 .u-btn-1 {border-style: none; text-transform: uppercase; letter-spacing: 1px; font-weight: 700}
+.u-section-1 .u-text-1 {margin: 30px 0 60px}
+.u-section-1 .u-btn-2 {padding: 0} 
+
+@media (max-width: 1199px){ .u-section-1 .u-sheet-1 {min-height: 860px}
+.u-section-1 .u-form-1 {width: 470px; margin-top: 60px} }
+
+@media (max-width: 991px){ .u-section-1 .u-sheet-1 {min-height: 829px}
+.u-section-1 .u-form-1 {margin-top: 305px} }
+
+@media (max-width: 575px){ .u-section-1 .u-sheet-1 {min-height: 693px}
+.u-section-1 .u-form-1 {width: 340px} }.footer-fixed {
+position:fixed;
+bottom:0%;
+width:100%;
+}
+#loginStatus{
+    color:red;
+    margin-left:25%;
+}

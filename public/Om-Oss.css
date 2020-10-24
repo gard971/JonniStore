@@ -1,0 +1,10 @@
+.u-section-1 .u-sheet-1 {min-height: 755px}
+.u-section-1 .u-text-1 {font-weight: 700; text-transform: none; letter-spacing: normal; line-height: 26px; margin: 116px 48px 0 28px}
+.u-section-1 .u-text-2 {font-size: 3.75rem; font-weight: 700; margin: 28px 38px 0}
+.u-section-1 .u-text-3 {width: 744px; font-size: 1rem; margin: 126px auto 60px} 
+
+@media (max-width: 767px){ .u-section-1 .u-text-3 {margin-top: 23px; margin-left: 0; margin-right: 0; width: 540px} }
+
+@media (max-width: 575px){ .u-section-1 .u-text-1 {margin-left: 0; margin-right: 0}
+.u-section-1 .u-text-2 {margin-left: 0}
+.u-section-1 .u-text-3 {margin-top: 28px; width: 340px} }
