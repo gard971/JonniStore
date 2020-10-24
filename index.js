@@ -1,7 +1,12 @@
+//paypal dependecy. Trengs her for initialization av paypal variabel før paypal.configure in //instilinger
+const paypal = require("paypal-rest-sdk");
+
+//instillinger.
 var port = 3000;
 var saltRounds = 10;
 var emailUsername = ""
 var emailPassword = ""
+var websiteLink = "http://31.45.73.84"  //Brukes når det blir sendt ut mail om Feks. bekrefting av email. IKKE INKLUDER PORT!! HUSK http://  !!  fin ip på https://whatismyipaddress.com/
 
 paypal.configure({
     "mode": "sandbox", // skiftes til realtime når vi kommer inn i deploment
@@ -21,7 +26,6 @@ const path = require("path")
 const bcrypt = require("bcrypt")
 const nodemailer = require("nodemailer")
 const formidable = require("formidable")
-const paypal = require("paypal-rest-sdk");
 const PDFDocument = require("pdfkit")
 
 var approvedKeys = []
@@ -61,7 +65,7 @@ app.get("/success", (req, res) => { //paypal betalings prosess
         res.end()
     }
     else if(!req.query.email){
-        alert("missing email. You have not been charged!. Please go back to the main page and redoo the whole process")
+        res.send("missing email. You have not been charged!. Please go back to the main page and redoo the whole process")
     }
      else {
         var paymentId
@@ -182,7 +186,7 @@ io.on("connection", (socket) => {
                 } else {
                     socket.emit("userCreated")
                 }
-                sendMail(newObject.username, "Confirm Email", `hello ${newObject.username} you can confirm you email by pressing this link: http://31.45.72.232/confirm.html?id=${newObject.confirmation.id}`)
+                sendMail(newObject.username, "Confirm Email", `hello ${newObject.username} you can confirm you email by pressing this link: ${websiteLink}:${port}/confirm.html?id=${newObject.confirmation.id}`)
             }
         })
     })
@@ -227,6 +231,20 @@ io.on("connection", (socket) => {
                 socket.emit("spesificProduct", product)
             }
         })
+    })
+    socket.on("newEmail", (email) => {
+        var users = jsonRead("data/users.json")
+        var found = false
+        users.forEach(user => {
+            if (user.username == email && user.confirmation) {
+                sendMail(email, "Confirm Email", `hello ${email} you can confirm you email by pressing this link: ${websiteLink}:${port}/confirm.html?id=${user.confirmation.id}`)
+                socket.emit("newMailSent")
+                found = true
+            }
+        })
+        if (!found) {
+            socket.emit("eror", "Could not send email. Please double check the email you supplied")
+        }
     })
 })
 
