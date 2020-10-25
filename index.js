@@ -75,15 +75,11 @@ app.get("/success", (req, res) => { //paypal betalings prosess
         var ammount
         var execute_payment_json
         var products = jsonRead("data/products.json")
-        console.log(products)
         products.forEach(product => {
-            console.log(product.name+ " "+req.query.product)
             if (product.name.replace("%20", " ") == req.query.product) {
-                console.log(product.cost)
                 ammount = product.cost
             }
         })
-        console.log(ammount)
         if (!ammount) {
             res.send("somthing went wrong when proccessing your request. You have not been charged")
             res.end()
@@ -106,7 +102,6 @@ app.get("/success", (req, res) => { //paypal betalings prosess
             if (error) {
                 res.send("somthing went wrong when proccessing your request. You have not been charged")
                 res.end()
-                console.log(error)
             } else {
                 sendMail(req.query.email, `Order confirmation`, `Helo ${req.query.email}, we have recived your order of "${req.query.product}" and we herby confirm that the transaction was succsesfully completed. We will alert you again when we have shipped your item!`)
                 res.redirect("TransactionCompleted.html")
@@ -138,15 +133,11 @@ app.use(express.static(path.join(__dirname, "public")))
 
 io.on("connection", (socket) => {
     socket.on("login", (username, password, rememberMe) => {
-        console.log(username+" "+password)
         var json = jsonRead("data/users.json")
         if(json){
             var found = false;
             var needConfirm = false
             json.forEach(user => {
-                console.log(user)
-                console.log(user.username == username)
-                console.log(bcrypt.compareSync(password, user.password))
                 if(user.username == username && bcrypt.compareSync(password, user.password) && user.confirmation){
                     socket.emit("redir", "AccountCreated.html")
                     needConfirm = true
@@ -160,12 +151,10 @@ io.on("connection", (socket) => {
                     approvedKeys.push(newObject)
                     found = true
                     socket.emit("passwordCorrect", newObject.username, newObject.key, rememberMe)
-                    console.log("correct")
                 }
             })
             if(!found && !needConfirm){
                 socket.emit("passwordWrong")
-                console.log("wrong")
             }
         }
     })
@@ -300,7 +289,6 @@ io.on("connection", (socket) => {
                         "description": actualName
                     }]
                 };
-                console.log(create_payment_json)
                 paypal.payment.create(create_payment_json, function (error, payment) {
                     if (error) {
                         console.error(error)
@@ -308,12 +296,47 @@ io.on("connection", (socket) => {
                         for (var i = 0; i < payment.links.length; i++) {
                             if (payment.links[i].rel == "approval_url") {
                                 socket.emit("redir", payment.links[i].href)
-                                console.log("redir")
                             }
                         }
                     }
                 })
             }
+        })
+    })
+    socket.on("requestWaitingOrders", () => {
+        var orders = jsonRead("data/waitingOrders.json")
+        socket.emit("waitingOrders", JSON.stringify(orders))
+    })
+    socket.on("getPDF", id => {
+        var orders = jsonRead("data/waitingOrders.json")
+        orders.forEach(order => {
+            if(order.orderID == id){
+                if(!fs.existsSync(`public/images/pdfs/shippment${id}.pdf`)){
+                var doc = new PDFDocument;
+                doc.pipe(fs.createWriteStream(`public/images/pdfs/shippment${id}.pdf`))
+                doc.text(order.shipping.name)
+                doc.text(order.shipping.adress)
+                doc.text(order.shipping.postal+" "+order.shipping.city)
+                doc.end()
+                }
+                socket.emit("PDF", `images/pdfs/shippment${id}.pdf`)
+            }
+        })
+    })
+    socket.on("ItemShipped", id => {
+        var orders = jsonRead("data/waitingOrders.json")
+        var index = 0;
+        orders.forEach(order => {
+            if(id == order.orderID){
+                sendMail(order.email, "Your order has shipped!", `hi ${order.email}, we have some great news for you. Your order of "${order.Item}" has shipped!`)
+                orders.splice(index, 1)
+                jsonWrite("data/waitingOrders.json", orders) 
+                io.sockets.emit("RemoveItem", id)
+                if(fs.existsSync(`public/images/pdfs/shippment${order.orderID}.pdf`)){
+                    fs.unlinkSync(`public/images/pdfs/shippment${order.orderID}.pdf`)
+                }
+            }
+            index++
         })
     })
 })

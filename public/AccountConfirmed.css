@@ -2,6 +2,8 @@
 .u-section-1 .u-text-1 {width: 680px; margin: 127px auto 0}
 .u-section-1 .u-text-2 {line-height: 1.8; width: 680px; margin: 20px auto 0}
 .u-section-1 .u-btn-1 {background-image: none; border-style: none none solid; margin: 30px auto 60px; padding: 0} 
+.u-section-1 {min-height: 675px;}
+
 
 @media (max-width: 991px){ .u-section-1 .u-sheet-1 {min-height: 447px} }
 

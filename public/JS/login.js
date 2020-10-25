@@ -11,8 +11,16 @@ $("#loginForm").on("submit", function(e) {
 socket.on("passwordCorrect", (username, key) => {
     localStorage.setItem("username", username)
     localStorage.setItem("key", key)
-    alert("correct")
+    window.location.href = "Butikk.html"
 })
 socket.on("passwordWrong", () => {
     document.getElementById("loginStatus").hidden = false
+})
+(function(){
+    if(localStorage.getItem("username") && localStorage.getItem("key")){
+        socket.emit("check", localStorage.getItem("username"), localStorage.getItem("key"))
+    }
+})()
+socket.on("allowed", () => {
+    window.location.href = "Butikk.html"
 })
