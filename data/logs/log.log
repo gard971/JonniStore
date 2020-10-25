@@ -1,0 +1,3 @@
+[25.10.2020 @ 17:23] Log file created, to disable logging check the index.js file: config section. logging is currently: true 
+[25.10.2020 @ 17:23] Error: No recipients defined
+[25.10.2020 @ 17:26] sent mail to gard.soreng@outlook.com

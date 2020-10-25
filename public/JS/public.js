@@ -3,4 +3,5 @@ socket.on("eror", msg => {
 })
 socket.on("redir", loc => {
     window.location.href= loc
+    console.log("redir")
 })

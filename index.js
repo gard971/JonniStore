@@ -8,6 +8,7 @@ var emailUsername = "gardsoreng@gmail.com"
 var emailPassword = "rhactdwiqjqwidos"
 var websiteLink = "http://31.45.73.84"  //Brukes når det blir sendt ut mail om Feks. bekrefting av email. IKKE INKLUDER PORT!! HUSK http://  !!  fin ip på https://whatismyipaddress.com/
 var supportMail = "gardsoreng@gmail.com" //Mailen som oppdateringer til for ekspempel kontakt oss blir sendt til
+var useLogs = true;
 
 paypal.configure({
     "mode": "sandbox", // skiftes til realtime når vi kommer inn i deploment
@@ -74,14 +75,19 @@ app.get("/success", (req, res) => { //paypal betalings prosess
         var ammount
         var execute_payment_json
         var products = jsonRead("data/products.json")
+        console.log(products)
         products.forEach(product => {
-            if (product.name == req.query.product) {
+            console.log(product.name+ " "+req.query.product)
+            if (product.name.replace("%20", " ") == req.query.product) {
+                console.log(product.cost)
                 ammount = product.cost
             }
         })
+        console.log(ammount)
         if (!ammount) {
             res.send("somthing went wrong when proccessing your request. You have not been charged")
             res.end()
+            return false;
         } else {
             payerId = req.query.PayerID;
             paymentId = req.query.paymentId;
@@ -90,7 +96,7 @@ app.get("/success", (req, res) => { //paypal betalings prosess
                 "payer_id": payerId,
                 "transactions": [{
                     "amount": {
-                        "currency": "USD",
+                        "currency": "NOK",
                         "total": ammount
                     }
                 }]
@@ -100,6 +106,7 @@ app.get("/success", (req, res) => { //paypal betalings prosess
             if (error) {
                 res.send("somthing went wrong when proccessing your request. You have not been charged")
                 res.end()
+                console.log(error)
             } else {
                 sendMail(req.query.email, `Order confirmation`, `Helo ${req.query.email}, we have recived your order of "${req.query.product}" and we herby confirm that the transaction was succsesfully completed. We will alert you again when we have shipped your item!`)
                 res.redirect("TransactionCompleted.html")
@@ -261,6 +268,53 @@ io.on("connection", (socket) => {
             sendMail(supportMail, "Ny melding fra kontakt oss", `Melding fra: ${name}. Melding: ${message}   navn: ${name}. email: ${email}`)
             sendMail(email, "PEG UB kontakt", `hei ${name}! Vi har mottat din melding og tar kontakt med deg så fort som mulig.`)
         }
+    })
+    socket.on("buy", (productName, email) => {
+        var products = jsonRead("data/products.json")
+        products.forEach(product => {
+            if (product.name == productName) {
+                var actualName = product.name.replace("%20", " ")
+                const create_payment_json = {
+                    "intent": "sale",
+                    "payer": {
+                        "payment_method": "paypal"
+                    },
+                    "redirect_urls": {
+                        "return_url": `${websiteLink}:${port}/success?product=${productName}&email=${email}`,
+                        "cancel_url": `${websiteLink}:${port}/cancel`
+                    },
+                    "transactions": [{
+                        "item_list": {
+                            "items": [{
+                                "name": actualName,
+                                "sku": "001",
+                                "price": product.cost,
+                                "currency": "NOK",
+                                "quantity": 1
+                            }]
+                        },
+                        "amount": {
+                            "currency": "NOK",
+                            "total": product.cost
+                        },
+                        "description": actualName
+                    }]
+                };
+                console.log(create_payment_json)
+                paypal.payment.create(create_payment_json, function (error, payment) {
+                    if (error) {
+                        console.error(error)
+                    } else {
+                        for (var i = 0; i < payment.links.length; i++) {
+                            if (payment.links[i].rel == "approval_url") {
+                                socket.emit("redir", payment.links[i].href)
+                                console.log("redir")
+                            }
+                        }
+                    }
+                })
+            }
+        })
     })
 })
 
