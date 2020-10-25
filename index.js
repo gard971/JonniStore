@@ -7,6 +7,7 @@ var saltRounds = 10;
 var emailUsername = "gardsoreng@gmail.com"
 var emailPassword = "rhactdwiqjqwidos"
 var websiteLink = "http://31.45.73.84"  //Brukes når det blir sendt ut mail om Feks. bekrefting av email. IKKE INKLUDER PORT!! HUSK http://  !!  fin ip på https://whatismyipaddress.com/
+var supportMail = "gardsoreng@gmail.com" //Mailen som oppdateringer til for ekspempel kontakt oss blir sendt til
 
 paypal.configure({
     "mode": "sandbox", // skiftes til realtime når vi kommer inn i deploment
@@ -255,6 +256,12 @@ io.on("connection", (socket) => {
             socket.emit("eror", "Could not send email. Please double check the email you supplied")
         }
     })
+    socket.on("kontakt", (name, email, message) => {
+        if(name, email, message){
+            sendMail(supportMail, "Ny melding fra kontakt oss", `Melding fra: ${name}. Melding: ${message}   navn: ${name}. email: ${email}`)
+            sendMail(email, "PEG UB kontakt", `hei ${name}! Vi har mottat din melding og tar kontakt med deg så fort som mulig.`)
+        }
+    })
 })
 
 function jsonRead(file) {
@@ -298,7 +305,7 @@ function sendMail(reciver, emailSubject, message) {
             from: emailUsername,
             to: reciver,
             subject: emailSubject,
-            text: message + " This is an automated message. Please do not respond"
+            text: message + " Dette er en automatisk sendt melding. Venligst ikke svar."
         }
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
