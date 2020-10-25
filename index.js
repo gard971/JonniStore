@@ -225,6 +225,9 @@ io.on("connection", (socket) => {
                 }
             }
         })
+        if(!found){
+            socket.emit("notConfirmed")
+        }
     })
     socket.on("requestProducts", () => {
         var json = jsonRead("data/products.json")

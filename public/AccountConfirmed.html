@@ -1,6 +1,11 @@
 <!DOCTYPE html>
 <html style="font-size: 16px;" lang="nb-NO">
   <head>
+    <script src="/socket.io/socket.io.js"></script>
+    <script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="utf-8">
     <meta name="keywords" content="">
@@ -126,9 +131,9 @@
       </div></header>
     <section class="u-align-center u-clearfix u-section-1" id="sec-7623">
       <div class="u-clearfix u-sheet u-sheet-1">
-        <h1 class="u-text u-text-1">Bruker bekreftet!</h1>
-        <p class="u-text u-text-2">Takk! Din bruker har blitt bekreftet og du kan nå bruke vår butikk.</p>
-        <a href="Logg-inn.html" class="u-active-none u-border-2 u-border-palette-1-base u-btn u-btn-rectangle u-button-style u-hover-none u-none u-btn-1">Logg Inn</a>
+        <h1 class="u-text u-text-1" id="txt">Bruker bekreftet!</h1>
+        <p class="u-text u-text-2" id="txt">Takk! Din bruker har blitt bekreftet og du kan nå bruke vår butikk.</p>
+        <a id="txt" href="Logg-inn.html" class="u-active-none u-border-2 u-border-palette-1-base u-btn u-btn-rectangle u-button-style u-hover-none u-none u-btn-1">Logg Inn</a>
       </div>
     </section>
     
@@ -221,5 +226,6 @@
       </a>. 
     </section>
   </body>
+  <script src="JS/accountConfirmed.js"></script>
   <script src="JS/public.js"></script>
 </html>
