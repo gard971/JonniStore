@@ -6,7 +6,7 @@ var port = 3000;
 var saltRounds = 10;
 var emailUsername = "gardsoreng@gmail.com"
 var emailPassword = "rhactdwiqjqwidos"
-var websiteLink = "http://31.45.73.84"  //Brukes når det blir sendt ut mail om Feks. bekrefting av email. IKKE INKLUDER PORT!! HUSK http://  !!  fin ip på https://whatismyipaddress.com/
+var websiteLink = "http://locahost"  //Brukes når det blir sendt ut mail om Feks. bekrefting av email. IKKE INKLUDER PORT!! HUSK http://  !!  fin ip på https://whatismyipaddress.com/
 var supportMail = "gardsoreng@gmail.com" //Mailen som oppdateringer til for ekspempel kontakt oss blir sendt til
 var useLogs = true;
 
