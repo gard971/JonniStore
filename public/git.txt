@@ -1,1 +1,0 @@
-denne filen er her så mappen "public" ikke blir slettet. Når public blir fylt opp med andre filer kan denne filen slettes. (Github sletter automatisk tomme mapper)aaa
