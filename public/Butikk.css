@@ -37,3 +37,6 @@
 .u-section-1 .u-group-1 {min-height: 257px; margin-top: 24px; width: auto; margin-right: initial; margin-left: initial}
 .u-section-1 .u-container-layout-2 {padding-left: 10px; padding-right: 10px}
 .u-section-1 .u-btn-1 {padding-right: 88px; padding-left: 86px} }
+#kjopKnapp :hover{
+  cursor:default
+}

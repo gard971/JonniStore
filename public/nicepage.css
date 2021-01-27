@@ -5135,6 +5135,9 @@ a {
     align-items: stretch;
     margin: -0.5rem !important;
   }
+  #prototype1{
+    visibility: hidden;
+  }
   .u-form-horizontal .u-form-group {
     margin: 0.5rem !important;
   }
@@ -30759,3 +30762,44 @@ a.u-link.u-text-hover-grey-90:hover {
  /*begin-variables base-font-size*/ 
  html { font-size: 16px; }
  /*end-variables base-font-size*/
+
+#prototype1{
+  top:30%;
+  width: 30%;
+  position: absolute;
+  right:90%;;
+  margin:0;
+}
+@media(max-width:1156px){
+  #prototype1{
+    visibility: hidden;
+  }
+  #prototype2{
+    visibility: hidden;
+  }
+  #imgBelowText{
+    display: inline;
+  }
+}
+#prototype2{
+  width: 30%;
+  position: absolute;
+  left:90%;
+  top:30%;
+}
+#imgBelowText{
+  margin-top:0;
+  margin-left:-180px;
+  width:30%;
+  position: relative;;
+  left:8%;
+  bottom: 50%;
+}
+#infoP{
+  margin-bottom:0;
+}
+@media(max-width:558px){
+  .svgRemove{
+    display: none;
+  }
+}
