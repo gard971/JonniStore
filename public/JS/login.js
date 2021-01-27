@@ -15,7 +15,7 @@ socket.on("passwordCorrect", (username, key) => {
 })
 socket.on("passwordWrong", () => {
     document.getElementById("loginStatus").hidden = false
-})
+});
 (function(){
     if(localStorage.getItem("username") && localStorage.getItem("key")){
         socket.emit("check", localStorage.getItem("username"), localStorage.getItem("key"))
@@ -23,4 +23,15 @@ socket.on("passwordWrong", () => {
 })()
 socket.on("allowed", () => {
     window.location.href = "Butikk.html"
+});
+(function(){
+    if(localStorage.getItem("username") && localStorage.getItem("key")){
+        socket.emit("check", localStorage.getItem("username"), localStorage.getItem("key"))
+    }
+    else if(sessionStorage.getItem("username") && sessionStorage.getItem("key")){
+        socket.emit("check", sessionStorage.getItem("username"), sessionStorage.getItem("key"))
+    }
+})()
+socket.on("allowed", () => {
+    window.location.href="Butikk.html"
 })
