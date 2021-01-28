@@ -5,8 +5,8 @@ const paypal = require("paypal-rest-sdk");
 var port = 3000;
 var saltRounds = 10;
 var emailUsername = "gardsoreng@gmail.com"
-var emailPassword = "rhactdwiqjqwidos"
-var websiteLink = "http://locahost"  //Brukes når det blir sendt ut mail om Feks. bekrefting av email. IKKE INKLUDER PORT!! HUSK http://  !!  fin ip på https://whatismyipaddress.com/
+var emailPassword = "rsipavzavgfeveqe"
+var websiteLink = "http://localhost"  //Brukes når det blir sendt ut mail om Feks. bekrefting av email. IKKE INKLUDER PORT!! HUSK http://  !!  fin ip på https://whatismyipaddress.com/
 var supportMail = "gardsoreng@gmail.com" //Mailen som oppdateringer til for ekspempel kontakt oss blir sendt til
 var useLogs = true;
 
@@ -68,6 +68,7 @@ app.get("/success", (req, res) => { //paypal betalings prosess
     }
     else if(!req.query.email){
         res.send("missing email. You have not been charged!. Please go back to the main page and redoo the whole process")
+        res.end()
     }
      else {
         var paymentId
@@ -103,10 +104,11 @@ app.get("/success", (req, res) => { //paypal betalings prosess
                 res.send("somthing went wrong when proccessing your request. You have not been charged")
                 res.end()
             } else {
-                sendMail(req.query.email, `Order confirmation`, `Helo ${req.query.email}, we have recived your order of "${req.query.product}" and we herby confirm that the transaction was succsesfully completed. We will alert you again when we have shipped your item!`)
+                
+                var genInfo = jsonRead("data/genInfo.json")
+                sendMail(req.query.email, `Ordre bekreftelse`, `hei ${req.query.email}, vi har mottat din bestiling på "${req.query.product}", referansenummer: ${genInfo.nextOrderID}. Du kommer til å få en ny mail av oss når pakken er sendt. Hvis du lurer på noe er det bare å ta kontakt med oss: ${websiteLink}:${port}/Kontakt-Oss.html`)
                 res.redirect("TransactionCompleted.html")
                 res.end()
-                var genInfo = jsonRead("data/genInfo.json")
                 var newObject = {
                     "orderID":genInfo.nextOrderID,
                     "Item":req.query.product,
@@ -128,7 +130,7 @@ app.get("/success", (req, res) => { //paypal betalings prosess
                 newObject = {
                     "refrence":genInfo.nextOrderID,
                     "name":payment.payer.payer_info.shipping_address.recipient_name,
-                    "Item": req.query.product,
+                    "item": req.query.product,
                     "status": "venter på avsending"
                 }
                 allOrders.push(newObject)
