@@ -1,0 +1,19 @@
+.panel p{
+    padding:20px;
+    background-color:lightgray;
+    border: 2px solid grey;
+    margin-top:5px;
+    margin-bottom:5px;
+}
+.panel{
+    position: absolute;
+    left:50%;
+    top:50%;
+    margin-left:-103.969px;
+    margin-top:-124.8px;
+}
+.panel p:hover{
+    border-width: 5px;
+    margin:0px;
+    cursor: pointer;
+}
