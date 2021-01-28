@@ -1,0 +1,13 @@
+#searchBar{
+    position: absolute;
+    left:50%;
+    top:30px;
+    margin-left:-78.4px;
+}
+body{
+    text-align: center;
+}
+#ul{
+    list-style: none;
+    margin-top:6%;
+}

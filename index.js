@@ -121,9 +121,20 @@ app.get("/success", (req, res) => { //paypal betalings prosess
                 var orders = jsonRead("data/waitingOrders.json")
                 orders.push(newObject)
                 jsonWrite("data/waitingOrders.json", orders)
+                io.sockets.emit("newOrder", newObject)
+
+                
+                var allOrders = jsonRead("data/allOrders.json")
+                newObject = {
+                    "refrence":genInfo.nextOrderID,
+                    "name":payment.payer.payer_info.shipping_address.recipient_name,
+                    "Item": req.query.product,
+                    "status": "venter på avsending"
+                }
+                allOrders.push(newObject)
+                jsonWrite("data/allOrders.json", allOrders)
                 genInfo.nextOrderID++
                 jsonWrite("data/genInfo.json", genInfo)
-                io.sockets.emit("newOrder", newObject)
             }
         })
     }
@@ -137,16 +148,21 @@ io.on("connection", (socket) => {
         if(json){
             var found = false;
             var needConfirm = false
+            var superAdmin = false
             json.forEach(user => {
                 if(user.username == username && bcrypt.compareSync(password, user.password) && user.confirmation){
                     socket.emit("redir", "AccountCreated.html")
                     needConfirm = true
                 }
                 else if(user.username == username && bcrypt.compareSync(password, user.password)){
+                    if(user.superAdmin){
+                        superAdmin = true
+                    }
                     var newObject = {
                         "username": username,
                         "key": Math.floor(Math.random() * 100000000000000000000),
-                        "admin": user.admin
+                        "admin": user.admin,
+                        "superAdmin": superAdmin
                     }
                     approvedKeys.push(newObject)
                     found = true
@@ -193,10 +209,14 @@ io.on("connection", (socket) => {
             }
         })
     })
-    socket.on("check", (username, key, needsAdminPerms) => {
+    socket.on("check", (username, key, needsAdminPerms, needsSuperAdmin) => {
         var found = false
+        var superAdmin = false
         approvedKeys.forEach(approvedKey => {
             if (approvedKey.username == username && approvedKey.key == key) {
+                if(approvedKey.superAdmin){
+                    superAdmin = true
+                }
                 if (needsAdminPerms && approvedKey.admin) {
                     found = true
                 } else if (!needsAdminPerms) {
@@ -206,7 +226,11 @@ io.on("connection", (socket) => {
         })
         if (!found) {
             socket.emit("notAllowed")
-        } else {
+        } else if(needsSuperAdmin && found) {
+            socket.emit("allowed", superAdmin)
+            console.log(superAdmin)
+        }
+        else if(found){
             socket.emit("allowed")
         }
     })
@@ -330,7 +354,14 @@ io.on("connection", (socket) => {
             if(id == order.orderID){
                 sendMail(order.email, "Your order has shipped!", `hi ${order.email}, we have some great news for you. Your order of "${order.Item}" has shipped!`)
                 orders.splice(index, 1)
-                jsonWrite("data/waitingOrders.json", orders) 
+                jsonWrite("data/waitingOrders.json", orders)
+                var allOrders = jsonRead("data/allOrders.json")
+                allOrders.forEach(allOrder => {
+                    if(allOrder.refrence == id){
+                        allOrder.status = "Gjenstand bekreftet sendt av betjener"
+                    }
+                })
+                jsonWrite("data/allorders.json", allOrders)
                 io.sockets.emit("RemoveItem", id)
                 if(fs.existsSync(`public/images/pdfs/shippment${order.orderID}.pdf`)){
                     fs.unlinkSync(`public/images/pdfs/shippment${order.orderID}.pdf`)
@@ -338,6 +369,21 @@ io.on("connection", (socket) => {
             }
             index++
         })
+    })
+    socket.on("refrenceSearch", string => {
+        var ordersToSend = []
+        var orders = jsonRead("data/allOrders.json")
+        orders.forEach(order => {
+            console.log()
+            if((order.refrence+'').includes(string) && (order.refrence+'').length >= string){
+                ordersToSend.push(order)
+            }
+            else if(order.name.toLowerCase().includes(string.toLowerCase()) && order.name.length >= string.length){
+                ordersToSend.push(order)
+            }
+        })
+        console.log(ordersToSend)
+        socket.emit("searchReturn", ordersToSend)
     })
 })
 
