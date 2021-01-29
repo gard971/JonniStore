@@ -1,0 +1,13 @@
+#tooltip{
+    position: absolute;
+    background-color:lightgray;
+    border:2px solid grey;
+    box-shadow: 5px 5px lightgrey;
+    padding:4px;
+}
+body{
+    text-align: center;
+}
+#newAdminForm{
+    margin: 5%;
+}
