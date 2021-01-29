@@ -30770,6 +30770,7 @@ a.u-link.u-text-hover-grey-90:hover {
   right:90%;;
   margin:0;
 }
+
 @media(max-width:1156px){
   #prototype1{
     visibility: hidden;
@@ -30784,7 +30785,7 @@ a.u-link.u-text-hover-grey-90:hover {
 #prototype2{
   width: 30%;
   position: absolute;
-  left:90%;
+  left:85%;
   top:30%;
 }
 #imgBelowText{
@@ -30801,5 +30802,13 @@ a.u-link.u-text-hover-grey-90:hover {
 @media(max-width:558px){
   .svgRemove{
     display: none;
+  }
+}
+@media(min-width:1199px) and (max-width:1300px){
+  #prototype2{
+    left:80%;
+  }
+  #prototype1{
+    right:85%;
   }
 }
