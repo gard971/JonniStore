@@ -1,4 +1,5 @@
 var socket = io();
+
 (function () {
     if (sessionStorage.getItem("username") && sessionStorage.getItem("key")) {
         socket.emit("check", sessionStorage.getItem("username"), sessionStorage.getItem("key"), true, true)
@@ -15,6 +16,7 @@ socket.on("allowed", (superAdmin) => {
         window.location.href = "/"
     }
     else {
+
         document.getElementById("newAdminForm").style.display = "inline"
         document.getElementById("newAdminForm").addEventListener("submit", (e) => {
             e.preventDefault()
@@ -22,12 +24,12 @@ socket.on("allowed", (superAdmin) => {
         })
     }
 })
-socket.on("userReturn", users => {
-    console.log(users)
+
+socket.on("userReturn", users =>{
     display(users)
 })
-function display(list) {
-    while (document.getElementById("ul").firstChild) {
+function display(list){
+    while(document.getElementById("ul").firstChild){
         document.getElementById("ul").removeChild(document.getElementById("ul").firstChild)
     }
     var htmlString = list.map(object => {
@@ -57,4 +59,5 @@ function display(list) {
             document.getElementById("tooltip").style.display = "inline"
         }
     }
+
 }
