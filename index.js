@@ -339,6 +339,37 @@ io.on("connection", (socket) => {
             index++
         })
     })
+<<<<<<< Updated upstream
+=======
+    socket.on("refrenceSearch", string => {
+        var ordersToSend = []
+        var orders = jsonRead("data/allOrders.json")
+        orders.forEach(order => {
+            console.log()
+            if((order.refrence+'').includes(string) && (order.refrence+'').length >= string){
+                ordersToSend.push(order)
+            }
+            else if(order.name.toLowerCase().includes(string.toLowerCase()) && order.name.length >= string.length){
+                ordersToSend.push(order)
+            }
+        })
+        console.log(ordersToSend)
+        socket.emit("searchReturn", ordersToSend)
+    })
+    socket.on("getUsers", (string) => {
+        var response = []
+        var users = jsonRead("data/users.json")
+        users.forEach(user => {
+            if(user.username.toLowerCase().includes(string.toLowerCase()) && user.username.length >= string.length){
+                var newObject = {
+                    "username":user.username
+                }
+                response.push(newObject)
+            }
+        })
+        socket.emit("userReturn", response)
+    })
+>>>>>>> Stashed changes
 })
 
 function jsonRead(file) {
