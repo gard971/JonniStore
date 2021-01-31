@@ -5135,6 +5135,7 @@ a {
     align-items: stretch;
     margin: -0.5rem !important;
   }
+
   #prototype1{
     visibility: hidden;
   }
@@ -30814,4 +30815,12 @@ a.u-link.u-text-hover-grey-90:hover {
 }
 #tiktokVideo{
   width: 20%;
+}
+@media(max-width:767px){
+  #tiktokVideo{
+    width: 60%;
+  }
+  body{
+    overflow-x: hidden;
+  }
 }
