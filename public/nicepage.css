@@ -30785,13 +30785,8 @@ a.u-link.u-text-hover-grey-90:hover {
 #prototype2{
   width: 30%;
   position: absolute;
-<<<<<<< Updated upstream
-  left:85%;
-  top:30%;
-=======
   left:90%;
   top:15%;
->>>>>>> Stashed changes
 }
 #imgBelowText{
   margin-top:0;
@@ -30802,14 +30797,13 @@ a.u-link.u-text-hover-grey-90:hover {
   bottom: 50%;
 }
 #infoP{
-  margin-bottom:0;
+  margin-bottom:5%;
 }
 @media(max-width:558px){
   .svgRemove{
     display: none;
   }
 }
-<<<<<<< Updated upstream
 @media(min-width:1199px) and (max-width:1300px){
   #prototype2{
     left:80%;
@@ -30818,8 +30812,6 @@ a.u-link.u-text-hover-grey-90:hover {
     right:85%;
   }
 }
-=======
 #tiktokVideo{
-  object-fit: fill;
+  width: 20%;
 }
->>>>>>> Stashed changes
