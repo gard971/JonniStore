@@ -11,7 +11,7 @@ SALT=10
 EMAIL=changeme
 EMAILPASSWORD=changeme
 
-# Domenenav eks: http://pegub.com
+# Domenenav eksempelvis: http://pegub.com
 DOMAIN=http://localhost
 
 # ignorer:
