@@ -413,6 +413,11 @@ io.on("connection", (socket) => {
                         log(`administrator ${username} la til ${adminToAdd} som administrator`)
                         socket.emit("adminAdded")
                         jsonWrite("data/users.json", users)
+                        for(var i=0; i<approvedKeys.length; i++){
+                            if(approvedKeys[i].username == adminToAdd){
+                                approvedKeys.splice(i, 1)
+                            }
+                        }
                     }
                 })
             } else {
@@ -435,6 +440,11 @@ io.on("connection", (socket) => {
                             log(`administrator ${username} fjernet ${adminToRemove} fra administrator rollen`)
                             jsonWrite("data/users.json", users)
                             socket.emit("adminRemoved")
+                            for(var i = 0; i<approvedKeys.length; i++){
+                                if(approvedKeys[i].username == adminToRemove){
+                                    approvedKeys.splice(i, 1)
+                                }
+                            }
                         }
                     })
                 } else {

@@ -1,3 +1,4 @@
+
 var socket = io();
 
 (function () {
@@ -84,9 +85,9 @@ function display(list){
         elements[i].onmouseenter = function (e) {
             document.getElementById("tooltip").style.display = "inline"
         }
-        var email = elements[i].innerHTML
+        console.log(elements[i])
         elements[i].onclick = function(){
-            addAdmin(email)
+            addAdmin(this.innerHTML)
         }
     }
     var nonAdminElems = document.getElementsByClassName("admintrue")
