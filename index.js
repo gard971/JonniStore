@@ -1,19 +1,21 @@
 //paypal dependecy. Trengs her for initialization av paypal variabel før paypal.configure in //instilinger
 const paypal = require("paypal-rest-sdk");
+const dotenv = require("dotenv").config()
+
 
 //instillinger.
-var port = 3000;
-var saltRounds = 10;
-var emailUsername = "gardsoreng@gmail.com"
-var emailPassword = "rsipavzavgfeveqe"
-var websiteLink = "http://localhost"  //Brukes når det blir sendt ut mail om Feks. bekrefting av email. IKKE INKLUDER PORT!! HUSK http://  !!  fin ip på https://whatismyipaddress.com/
-var supportMail = "gardsoreng@gmail.com" //Mailen som oppdateringer til for ekspempel kontakt oss blir sendt til
-var useLogs = true;
+var port = process.env.PORT;
+var saltRounds = process.env.SALT;
+var emailUsername = process.env.EMAIL
+var emailPassword = process.env.EMAILPASSWORD
+var websiteLink = process.env.DOMAIN  //Brukes når det blir sendt ut mail om Feks. bekrefting av email. IKKE INKLUDER PORT!! HUSK http://  !!  fin ip på https://whatismyipaddress.com/
+var supportMail = process.env.EMAIL //Mailen som oppdateringer til for ekspempel kontakt oss blir sendt til
+var useLogs = process.env.USELOGS;
 
 paypal.configure({
-    "mode": "sandbox", // skiftes til realtime når vi kommer inn i deploment
-    "client_id": "AeY4EnVK7UJ_2AxR66cY_zXDrOAHjZq0TLVqnkpFY6BkwrOvdMXF9sYl44MAPcREP7ccuY-8dUxTB9cn",  //disse to leder til "gard docs" DISSE MÅ ENDRES TIL JONNI SIN PAYPAL
-    "client_secret": "EAqK2uTsxgJVVWD3Gy1JWIWvoDqJVMHf9s9yIWsbsSM-CYNnxGWf19wiAKkoT2CNMmdA9Q4ptNS-iU5G"
+    "mode": process.env.PAYPAL_MODE, // skiftes til realtime når vi kommer inn i deploment
+    "client_id": process.env.PAYPAL_ID,  //disse to leder til "gard docs" DISSE MÅ ENDRES TIL JONNI SIN PAYPAL
+    "client_secret": process.env.PAYPAL_SECRET
 })
 
 //dependecies
