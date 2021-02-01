@@ -5135,6 +5135,7 @@ a {
     align-items: stretch;
     margin: -0.5rem !important;
   }
+
   #prototype1{
     visibility: hidden;
   }
@@ -30786,7 +30787,7 @@ a.u-link.u-text-hover-grey-90:hover {
   width: 30%;
   position: absolute;
   left:90%;
-  top:15%;
+  top:20%;
 }
 #imgBelowText{
   margin-top:0;
@@ -30797,12 +30798,21 @@ a.u-link.u-text-hover-grey-90:hover {
   bottom: 50%;
 }
 #infoP{
-  margin-bottom:0;
+  margin-bottom:5%;
 }
 @media(max-width:558px){
   .svgRemove{
     display: none;
   }
+}
+
+@media(max-width:1538px){
+    #prototype2{
+      left:85%;
+    }
+    #prototype1{
+      right:85%;
+    }
 }
 @media(min-width:1199px) and (max-width:1300px){
   #prototype2{
@@ -30810,5 +30820,16 @@ a.u-link.u-text-hover-grey-90:hover {
   }
   #prototype1{
     right:85%;
+  }
+}
+#tiktokVideo{
+  width: 20%;
+}
+@media(max-width:767px){
+  #tiktokVideo{
+    width: 60%;
+  }
+  body{
+    overflow-x: hidden;
   }
 }
