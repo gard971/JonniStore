@@ -4,7 +4,6 @@ document.getElementById("searchForm").addEventListener("submit", (e) => {
     socket.emit("refrenceSearch", document.getElementById("searchBar").value)
 })
 socket.on("searchReturn", items => {
-    console.log(items)
     display(items)
 })
 function display(list){

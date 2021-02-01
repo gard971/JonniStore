@@ -8,13 +8,13 @@ var port = process.env.PORT;
 var saltRounds = process.env.SALT;
 var emailUsername = process.env.EMAIL
 var emailPassword = process.env.EMAILPASSWORD
-var websiteLink = process.env.DOMAIN  //Brukes når det blir sendt ut mail om Feks. bekrefting av email. IKKE INKLUDER PORT!! HUSK http://  !!  fin ip på https://whatismyipaddress.com/
+var websiteLink = process.env.DOMAIN //Brukes når det blir sendt ut mail om Feks. bekrefting av email. IKKE INKLUDER PORT!! HUSK http://  !!  fin ip på https://whatismyipaddress.com/
 var supportMail = process.env.EMAIL //Mailen som oppdateringer til for ekspempel kontakt oss blir sendt til
 var useLogs = process.env.USELOGS;
 
 paypal.configure({
     "mode": process.env.PAYPAL_MODE, // skiftes til realtime når vi kommer inn i deploment
-    "client_id": process.env.PAYPAL_ID,  //disse to leder til "gard docs" DISSE MÅ ENDRES TIL JONNI SIN PAYPAL
+    "client_id": process.env.PAYPAL_ID, //disse to leder til "gard docs" DISSE MÅ ENDRES TIL JONNI SIN PAYPAL
     "client_secret": process.env.PAYPAL_SECRET
 })
 
@@ -30,11 +30,10 @@ const path = require("path")
 const bcrypt = require("bcrypt")
 const nodemailer = require("nodemailer")
 const formidable = require("formidable")
-const PDFDocument = require("pdfkit")
-
+const PDFDocument = require("pdfkit");
 var approvedKeys = []
 
-app.post("/newProduct", (req, res) => {   //brukes for opplastning av nye produkt
+app.post("/newProduct", (req, res) => { //brukes for opplastning av nye produkt
     var formData = new formidable.IncomingForm()
     formData.parse(req, (err, fields, files) => {
         var extension = files.file.name.substr(files.file.name.lastIndexOf("."))
@@ -67,12 +66,10 @@ app.get("/success", (req, res) => { //paypal betalings prosess
     if (!req.query.product) {
         res.send("Missing product name. You have not been charged. Please try again")
         res.end()
-    }
-    else if(!req.query.email){
+    } else if (!req.query.email) {
         res.send("missing email. You have not been charged!. Please go back to the main page and redoo the whole process")
         res.end()
-    }
-     else {
+    } else {
         var paymentId
         var payerId
         var ammount
@@ -106,20 +103,20 @@ app.get("/success", (req, res) => { //paypal betalings prosess
                 res.send("somthing went wrong when proccessing your request. You have not been charged")
                 res.end()
             } else {
-                
+
                 var genInfo = jsonRead("data/genInfo.json")
                 sendMail(req.query.email, `Ordre bekreftelse`, `hei ${req.query.email}, vi har mottat din bestiling på "${req.query.product}", referansenummer: ${genInfo.nextOrderID}. Du kommer til å få en ny mail av oss når pakken er sendt. Hvis du lurer på noe er det bare å ta kontakt med oss: ${websiteLink}:${port}/Kontakt-Oss.html`)
                 res.redirect("TransactionCompleted.html")
                 res.end()
                 var newObject = {
-                    "orderID":genInfo.nextOrderID,
-                    "Item":req.query.product,
-                    "email":req.query.email,
-                    "shipping":{
-                        "name":payment.payer.payer_info.shipping_address.recipient_name,
+                    "orderID": genInfo.nextOrderID,
+                    "Item": req.query.product,
+                    "email": req.query.email,
+                    "shipping": {
+                        "name": payment.payer.payer_info.shipping_address.recipient_name,
                         "adress": payment.payer.payer_info.shipping_address.line1,
-                        "city":payment.payer.payer_info.shipping_address.city,
-                        "postal":payment.payer.payer_info.shipping_address.postal_code
+                        "city": payment.payer.payer_info.shipping_address.city,
+                        "postal": payment.payer.payer_info.shipping_address.postal_code
                     }
                 }
                 var orders = jsonRead("data/waitingOrders.json")
@@ -127,11 +124,11 @@ app.get("/success", (req, res) => { //paypal betalings prosess
                 jsonWrite("data/waitingOrders.json", orders)
                 io.sockets.emit("newOrder", newObject)
 
-                
+
                 var allOrders = jsonRead("data/allOrders.json")
                 newObject = {
-                    "refrence":genInfo.nextOrderID,
-                    "name":payment.payer.payer_info.shipping_address.recipient_name,
+                    "refrence": genInfo.nextOrderID,
+                    "name": payment.payer.payer_info.shipping_address.recipient_name,
                     "item": req.query.product,
                     "status": "venter på avsending"
                 }
@@ -142,24 +139,23 @@ app.get("/success", (req, res) => { //paypal betalings prosess
             }
         })
     }
-})//slutt av betalingsprosess
+}) //slutt av betalingsprosess
 
 app.use(express.static(path.join(__dirname, "public")))
 
 io.on("connection", (socket) => {
     socket.on("login", (username, password, rememberMe) => {
         var json = jsonRead("data/users.json")
-        if(json){
+        if (json) {
             var found = false;
             var needConfirm = false
             var superAdmin = false
             json.forEach(user => {
-                if(user.username == username && bcrypt.compareSync(password, user.password) && user.confirmation){
+                if (user.username == username && bcrypt.compareSync(password, user.password) && user.confirmation) {
                     socket.emit("redir", "AccountCreated.html")
                     needConfirm = true
-                }
-                else if(user.username == username && bcrypt.compareSync(password, user.password)){
-                    if(user.superAdmin){
+                } else if (user.username == username && bcrypt.compareSync(password, user.password)) {
+                    if (user.superAdmin) {
                         superAdmin = true
                     }
                     var newObject = {
@@ -173,7 +169,7 @@ io.on("connection", (socket) => {
                     socket.emit("passwordCorrect", newObject.username, newObject.key, rememberMe)
                 }
             })
-            if(!found && !needConfirm){
+            if (!found && !needConfirm) {
                 socket.emit("passwordWrong")
             }
         }
@@ -218,7 +214,7 @@ io.on("connection", (socket) => {
         var superAdmin = false
         approvedKeys.forEach(approvedKey => {
             if (approvedKey.username == username && approvedKey.key == key) {
-                if(approvedKey.superAdmin){
+                if (approvedKey.superAdmin) {
                     superAdmin = true
                 }
                 if (needsAdminPerms && approvedKey.admin) {
@@ -230,11 +226,9 @@ io.on("connection", (socket) => {
         })
         if (!found) {
             socket.emit("notAllowed")
-        } else if(needsSuperAdmin && found) {
+        } else if (needsSuperAdmin && found) {
             socket.emit("allowed", superAdmin)
-            console.log(superAdmin)
-        }
-        else if(found){
+        } else if (found) {
             socket.emit("allowed")
         }
     })
@@ -250,7 +244,7 @@ io.on("connection", (socket) => {
                 }
             }
         })
-        if(!found){
+        if (!found) {
             socket.emit("notConfirmed")
         }
     })
@@ -281,7 +275,7 @@ io.on("connection", (socket) => {
         }
     })
     socket.on("kontakt", (name, email, message) => {
-        if(name, email, message){
+        if (name, email, message) {
             sendMail(supportMail, "Ny melding fra kontakt oss", `Melding fra: ${name}. Melding: ${message}   navn: ${name}. email: ${email}`)
             sendMail(email, "PEG UB kontakt", `hei ${name}! Vi har mottat din melding og tar kontakt med deg så fort som mulig.`)
         }
@@ -338,14 +332,14 @@ io.on("connection", (socket) => {
     socket.on("getPDF", id => {
         var orders = jsonRead("data/waitingOrders.json")
         orders.forEach(order => {
-            if(order.orderID == id){
-                if(!fs.existsSync(`public/images/pdfs/shippment${id}.pdf`)){
-                var doc = new PDFDocument;
-                doc.pipe(fs.createWriteStream(`public/images/pdfs/shippment${id}.pdf`))
-                doc.text(order.shipping.name)
-                doc.text(order.shipping.adress)
-                doc.text(order.shipping.postal+" "+order.shipping.city)
-                doc.end()
+            if (order.orderID == id) {
+                if (!fs.existsSync(`public/images/pdfs/shippment${id}.pdf`)) {
+                    var doc = new PDFDocument;
+                    doc.pipe(fs.createWriteStream(`public/images/pdfs/shippment${id}.pdf`))
+                    doc.text(order.shipping.name)
+                    doc.text(order.shipping.adress)
+                    doc.text(order.shipping.postal + " " + order.shipping.city)
+                    doc.end()
                 }
                 socket.emit("PDF", `images/pdfs/shippment${id}.pdf`)
             }
@@ -355,19 +349,19 @@ io.on("connection", (socket) => {
         var orders = jsonRead("data/waitingOrders.json")
         var index = 0;
         orders.forEach(order => {
-            if(id == order.orderID){
+            if (id == order.orderID) {
                 sendMail(order.email, "Your order has shipped!", `hi ${order.email}, we have some great news for you. Your order of "${order.Item}" has shipped!`)
                 orders.splice(index, 1)
                 jsonWrite("data/waitingOrders.json", orders)
                 var allOrders = jsonRead("data/allOrders.json")
                 allOrders.forEach(allOrder => {
-                    if(allOrder.refrence == id){
+                    if (allOrder.refrence == id) {
                         allOrder.status = "Gjenstand bekreftet sendt av betjener"
                     }
                 })
                 jsonWrite("data/allorders.json", allOrders)
                 io.sockets.emit("RemoveItem", id)
-                if(fs.existsSync(`public/images/pdfs/shippment${order.orderID}.pdf`)){
+                if (fs.existsSync(`public/images/pdfs/shippment${order.orderID}.pdf`)) {
                     fs.unlinkSync(`public/images/pdfs/shippment${order.orderID}.pdf`)
                 }
             }
@@ -378,29 +372,78 @@ io.on("connection", (socket) => {
         var ordersToSend = []
         var orders = jsonRead("data/allOrders.json")
         orders.forEach(order => {
-            console.log()
-            if((order.refrence+'').includes(string) && (order.refrence+'').length >= string){
+            if ((order.refrence + '').includes(string) && (order.refrence + '').length >= string) {
                 ordersToSend.push(order)
-            }
-            else if(order.name.toLowerCase().includes(string.toLowerCase()) && order.name.length >= string.length){
+            } else if (order.name.toLowerCase().includes(string.toLowerCase()) && order.name.length >= string.length) {
                 ordersToSend.push(order)
             }
         })
-        console.log(ordersToSend)
         socket.emit("searchReturn", ordersToSend)
     })
-    socket.on("getUsers", (string) => {
-        var response = []
-        var users = jsonRead("data/users.json")
-        users.forEach(user => {
-            if(user.username.toLowerCase().includes(string.toLowerCase()) && user.username.length >= string.length){
-                var newObject = {
-                    "username":user.username
-                }
-                response.push(newObject)
+    socket.on("getUsers", (string, username, key) => {
+        var loggedIn = check(username, key)
+        if (loggedIn) {
+            if (loggedIn[0]) {
+                var superAdmin = loggedIn[1]
+                var response = []
+                var users = jsonRead("data/users.json")
+                users.forEach(user => {
+                    if (superAdmin) {
+                        if (user.username.toLowerCase().includes(string.toLowerCase()) && user.username.length >= string.length) {
+                            var newObject = {
+                                "username": user.username,
+                                "isAdmin": user.admin
+                            }
+                            response.push(newObject)
+                        }
+                    }
+                })
+                socket.emit("userReturn", response)
             }
-        })
-        socket.emit("userReturn", response)
+        }
+    })
+    socket.on("addAdmin", (username, key, adminToAdd) => {
+        var loggedIn = check(username, key)
+        if (loggedIn) {
+            if (loggedIn[0] == true && loggedIn[1] == true) {
+                var users = jsonRead("data/users.json")
+                users.forEach(user => {
+                    if (user.username == adminToAdd) {
+                        user.admin = true
+                        log(`administrator ${username} la til ${adminToAdd} som administrator`)
+                        socket.emit("adminAdded")
+                        jsonWrite("data/users.json", users)
+                    }
+                })
+            } else {
+                socket.emit("redir", "/")
+            }
+        } else {
+            socket.emit("redir", "login.html")
+        }
+    })
+    socket.on("removeAdmin", (username, key, adminToRemove) => {
+        var loggedIn = check(username, key)
+        if (loggedIn) {
+            if (loggedIn) { 
+                if (loggedIn[0] && loggedIn[1]) {
+                    var users = jsonRead("data/users.json")
+                    users.forEach(user => {
+                        if (user.username == adminToRemove) {
+                            user.admin = false
+                            user.superAdmin = false
+                            log(`administrator ${username} fjernet ${adminToRemove} fra administrator rollen`)
+                            jsonWrite("data/users.json", users)
+                            socket.emit("adminRemoved")
+                        }
+                    })
+                } else {
+                    socket.emit("redir", "/")
+                }
+            }
+        } else {
+            socket.emit("redir", "Logg-Inn.html")
+        }
     })
 
 })
@@ -456,6 +499,25 @@ function sendMail(reciver, emailSubject, message) {
             log(`sent mail to ${reciver}`)
         })
     }
+}
+
+function check(username, key) {
+    var loggedIn
+    var admin
+    var superAdmin
+    approvedKeys.forEach(approvedKey => {
+        if (approvedKey.username == username && approvedKey.key == key) {
+            loggedIn = true
+            admin = approvedKey.admin
+            superAdmin = approvedKey.superAdmin
+        }
+    })
+    if (loggedIn) {
+        return [admin, superAdmin]
+    } else {
+        return false
+    }
+
 }
 
 function log(msg, isErr) { //main logging function
