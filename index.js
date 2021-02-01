@@ -31,6 +31,9 @@ const bcrypt = require("bcrypt")
 const nodemailer = require("nodemailer")
 const formidable = require("formidable")
 const PDFDocument = require("pdfkit");
+const {
+    isFunction
+} = require("util");
 var approvedKeys = []
 
 app.post("/newProduct", (req, res) => { //brukes for opplastning av nye produkt
@@ -345,28 +348,35 @@ io.on("connection", (socket) => {
             }
         })
     })
-    socket.on("ItemShipped", id => {
-        var orders = jsonRead("data/waitingOrders.json")
-        var index = 0;
-        orders.forEach(order => {
-            if (id == order.orderID) {
-                sendMail(order.email, "Your order has shipped!", `hi ${order.email}, we have some great news for you. Your order of "${order.Item}" has shipped!`)
-                orders.splice(index, 1)
-                jsonWrite("data/waitingOrders.json", orders)
-                var allOrders = jsonRead("data/allOrders.json")
-                allOrders.forEach(allOrder => {
-                    if (allOrder.refrence == id) {
-                        allOrder.status = "Gjenstand bekreftet sendt av betjener"
+    socket.on("ItemShipped", (id, username, key) => {
+        var loggedIn = check(username, key)
+        if (!loggedIn) {
+            socket.emit("redir", "Logg-Inn.html")
+        } else if (loggedIn[0] == true) {
+            var orders = jsonRead("data/waitingOrders.json")
+            var index = 0;
+            orders.forEach(order => {
+                if (id == order.orderID) {
+                    sendMail(order.email, "Your order has shipped!", `hi ${order.email}, we have some great news for you. Your order of "${order.Item}" has shipped!`)
+                    orders.splice(index, 1)
+                    jsonWrite("data/waitingOrders.json", orders)
+                    var allOrders = jsonRead("data/allOrders.json")
+                    allOrders.forEach(allOrder => {
+                        if (allOrder.refrence == id) {
+                            allOrder.status = "Gjenstand bekreftet sendt av betjener"
+                        }
+                    })
+                    jsonWrite("data/allorders.json", allOrders)
+                    io.sockets.emit("RemoveItem", id)
+                    if (fs.existsSync(`public/images/pdfs/shippment${order.orderID}.pdf`)) {
+                        fs.unlinkSync(`public/images/pdfs/shippment${order.orderID}.pdf`)
                     }
-                })
-                jsonWrite("data/allorders.json", allOrders)
-                io.sockets.emit("RemoveItem", id)
-                if (fs.existsSync(`public/images/pdfs/shippment${order.orderID}.pdf`)) {
-                    fs.unlinkSync(`public/images/pdfs/shippment${order.orderID}.pdf`)
                 }
-            }
-            index++
-        })
+                index++
+            })
+        } else {
+            socket.emit("redir", "/")
+        }
     })
     socket.on("refrenceSearch", string => {
         var ordersToSend = []
@@ -413,8 +423,8 @@ io.on("connection", (socket) => {
                         log(`administrator ${username} la til ${adminToAdd} som administrator`)
                         socket.emit("adminAdded")
                         jsonWrite("data/users.json", users)
-                        for(var i=0; i<approvedKeys.length; i++){
-                            if(approvedKeys[i].username == adminToAdd){
+                        for (var i = 0; i < approvedKeys.length; i++) {
+                            if (approvedKeys[i].username == adminToAdd) {
                                 approvedKeys.splice(i, 1)
                             }
                         }
@@ -430,7 +440,7 @@ io.on("connection", (socket) => {
     socket.on("removeAdmin", (username, key, adminToRemove) => {
         var loggedIn = check(username, key)
         if (loggedIn) {
-            if (loggedIn) { 
+            if (loggedIn) {
                 if (loggedIn[0] && loggedIn[1]) {
                     var users = jsonRead("data/users.json")
                     users.forEach(user => {
@@ -440,8 +450,8 @@ io.on("connection", (socket) => {
                             log(`administrator ${username} fjernet ${adminToRemove} fra administrator rollen`)
                             jsonWrite("data/users.json", users)
                             socket.emit("adminRemoved")
-                            for(var i = 0; i<approvedKeys.length; i++){
-                                if(approvedKeys[i].username == adminToRemove){
+                            for (var i = 0; i < approvedKeys.length; i++) {
+                                if (approvedKeys[i].username == adminToRemove) {
                                     approvedKeys.splice(i, 1)
                                 }
                             }
