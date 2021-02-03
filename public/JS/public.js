@@ -1,9 +1,15 @@
+window.onload = function(){
 socket.on("eror", msg => {
     console.error(`500 internal server error. Server responded with the following message: ${msg}`)
+    alert(`500 internal server error: ${msg}`)
+})
+socket.on("sendMSG", (msg) => {
+    alert(msg)
 })
 socket.on("redir", loc => {
     window.location.href= loc
 })
+}
 function redir(loc){
     window.location.href=loc
 }
@@ -19,7 +25,7 @@ function check(needAdmin, superAdmin){
          key = localStorage.getItem("key")
     }
     else{
-        window.location.href="index.html"
+        window.location.href="Logg-Inn.html"
     }
     if(username && key){
         socket.emit("check", username, key, needAdmin, superAdmin)

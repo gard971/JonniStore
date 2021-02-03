@@ -1,0 +1,55 @@
+#newColor input, button{
+    margin-top: 10px;
+    width: 100%;
+    padding:10px 0px 10px 0px;
+    font-size: large;
+    border:none;
+    border-bottom:3px solid black;
+    text-align: center;
+}
+::placeholder{
+    text-align: center;
+    font-size: large;
+}
+#newColor input:focus{
+    outline: none;
+}
+#newColor{
+    text-align: center;
+    position: absolute;
+    margin-left:-109.5px;
+    left:50%;
+    top:5%;
+}
+#newColor button:hover{
+    cursor: pointer;
+}
+#newColor button:active{
+    border: 3px solid black;
+}
+#existingColors{
+    position: absolute;
+    left:50%;
+    top:30%;
+    text-align: center;
+}
+#existingColorsP{
+    font-weight:bold;
+    font-size: large;
+}
+#existingColorsUL{
+    list-style: none;
+}
+#existingColorsUL li{
+    margin-top: 50px;
+}
+#tooltip{
+    position: absolute;
+    background-color:lightgray;
+    border:2px solid grey;
+    box-shadow: 5px 5px lightgrey;
+    padding:4px;
+}
+.LI:hover{
+    cursor: pointer;
+}

@@ -5,7 +5,7 @@ const dotenv = require("dotenv").config()
 
 //instillinger.
 var port = process.env.PORT;
-var saltRounds = process.env.SALT;
+var saltRounds = +process.env.SALT;
 var emailUsername = process.env.EMAIL
 var emailPassword = process.env.EMAILPASSWORD
 var websiteLink = process.env.DOMAIN //Brukes når det blir sendt ut mail om Feks. bekrefting av email. IKKE INKLUDER PORT!! HUSK http://  !!  fin ip på https://whatismyipaddress.com/
@@ -465,7 +465,63 @@ io.on("connection", (socket) => {
             socket.emit("redir", "Logg-Inn.html")
         }
     })
-
+    socket.on("addColor", (color, price, username, key) => {
+        var loggedIn = check(username, key)
+        if (loggedIn) {
+            var exists = false
+            if (loggedIn[0]) {
+                var colors = jsonRead("data/colors.json")
+                colors.forEach(colorFromDatabase => {
+                    console.log(colorFromDatabase.color + color)
+                    if (colorFromDatabase.color == color) {
+                        socket.emit("sendMSG", "Denne fargen finnes allerede. Hvis du vil endre pris venligst fjern fargen i listen under og oprett den deretter på nytt")
+                        exists = true
+                    }
+                })
+                if (!exists) {
+                    var updatedColor = encodeURIComponent(color.trim())
+                    var newObject = {
+                        "color": updatedColor,
+                        "price": price
+                    }
+                    colors.push(newObject)
+                    jsonWrite("data/colors.json", colors)
+                    socket.emit("colorAdded")
+                }
+            } else {
+                socket.emit("redir", "/")
+            }
+        } else {
+            socket.emit("redir", "Logg-Inn.html")
+        }
+    })
+    socket.on("getAllColors", () => {
+        var data = jsonRead("data/Colors.json")
+        if(data){
+            socket.emit("colorsReturn", data)
+        }
+    })
+    socket.on("removeColor", (color, username, key) => {
+        var loggedin = check(username, key)
+        if(loggedin){
+            if(loggedin[0]){
+                var colors = jsonRead("data/colors.json")
+                for(var i = 0; i<colors.length; i++){
+                    if(colors[i].color == color){
+                        colors.splice(i, 1)
+                        jsonWrite("data/colors.json", colors)
+                        socket.emit("colorDeleted")
+                    }
+                }
+            }
+            else{
+                socket.emit("redir", "/")
+            }
+        }
+        else{
+            socket.emit("redir", "Logg-Inn.html")
+        }
+    })
 })
 
 function jsonRead(file) {

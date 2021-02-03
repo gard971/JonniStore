@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="images/favicon.png">
+    <title>Legg Til/Fjern farge</title>
+<link rel="stylesheet" href="addproductcolor.css">
+</head>
+<body>
+    <div id="mainDiv">
+
+        <form id="newColor">
+            <input type="text" placeholder="Farge" id="color"><br>
+            <input type="number" placeholder="Pris" id="price"><br>
+            <button type="submit">Legg Til</button>
+        </form>
+        <div id="existingColors">
+            <p id="existingColorsP">Eksisterende farger (Trykk for å fjerne):</p>
+            <ul id="existingColorsUL">
+            </ul>
+        </div>
+    </div>
+    <script src="socket.io/socket.io.js"></script>
+    <script src="JS/public.js"></script>
+    <script src="JS/addProductColor.js"></script>
+</body>
+</html>
+
+<p id="tooltip" hidden>Trykk for å fjerne produkt</p>
