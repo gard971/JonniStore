@@ -115,5 +115,5 @@ dist
 .yarn/install-state.gz
 .pnp.*
 #Runtime:
-.data/
+data/
 data/colors.json
