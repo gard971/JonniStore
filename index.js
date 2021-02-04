@@ -17,7 +17,6 @@ paypal.configure({
     "client_id": process.env.PAYPAL_ID, //disse to leder til "gard docs" DISSE MÅ ENDRES TIL JONNI SIN PAYPAL
     "client_secret": process.env.PAYPAL_SECRET
 })
-console.log(process.env.PAYPAL_ID)
 
 //dependecies
 const app = require("express")()
@@ -297,7 +296,7 @@ io.on("connection", (socket) => {
                         },
                         "redirect_urls": {
                             "return_url": `${websiteLink}:${port}/success?product=${productName}&email=${email}`,
-                            "cancel_url": `${websiteLink}:${port}/cancel`
+                            "cancel_url": `${websiteLink}:${port}/cancel.html`
                         },
                         "transactions": [{
                             "item_list": {
@@ -478,7 +477,6 @@ io.on("connection", (socket) => {
             if (loggedIn[0]) {
                 var colors = jsonRead("data/colors.json")
                 colors.forEach(colorFromDatabase => {
-                    console.log(colorFromDatabase.color + color)
                     if (colorFromDatabase.color == color) {
                         socket.emit("sendMSG", "Denne fargen finnes allerede. Hvis du vil endre pris venligst fjern fargen i listen under og oprett den deretter på nytt")
                         exists = true
@@ -502,9 +500,12 @@ io.on("connection", (socket) => {
         }
     })
     socket.on("getAllColors", () => {
-        var data = jsonRead("data/Colors.json")
-        if (data) {
+        var data = jsonRead("data/colors.json")
+        if (data.length >= 1 || data == undefined) {
             socket.emit("colorsReturn", data)
+        }
+        else{
+            socket.emit("colorsReturn", false)
         }
     })
     socket.on("removeColor", (color, username, key) => {

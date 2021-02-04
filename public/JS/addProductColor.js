@@ -29,7 +29,14 @@ socket.on("notAllowed", () => {
     window.location.href="Logg-Inn.html"
 });
 socket.on("colorsReturn", colors => {
-    display(colors)
+    if(colors){
+        display(colors)
+    }
+    else{
+        while(document.getElementById("existingColorsUL").firstChild){
+            document.getElementById("existingColorsUL").removeChild(document.getElementById("existingColorsUL").firstChild)
+        }
+    }
 });
 socket.on("colorAdded", () => {
     var keys = getKeys()
