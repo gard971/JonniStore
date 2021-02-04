@@ -117,3 +117,6 @@ dist
 #Runtime:
 data/
 data/colors.json
+#certificates
+certificate.pem
+private.pem
