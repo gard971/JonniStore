@@ -31,6 +31,7 @@ var options = {
 const https = require("https").createServer(options, app).listen(port, () => {
     console.log(`server listening on port: ${port}`)
 })
+const http = express();
 const io = require("socket.io")(https)
 const path = require("path")
 const bcrypt = require("bcrypt")
@@ -42,6 +43,9 @@ const {
 } = require("util");
 var approvedKeys = []
 
+http.get('*', function(req, res) {  
+    res.redirect('https://' + req.headers.host + req.url); //redirecter alle http requests til https
+}).listen(80)
 app.post("/newProduct", (req, res) => { //brukes for opplastning av nye produkt
     var formData = new formidable.IncomingForm()
     formData.parse(req, (err, fields, files) => {
