@@ -2,32 +2,27 @@ var socket = io()
 
 var request = ""
 
-function buy(id){
-    if(localStorage.getItem("username") && localStorage.getItem("key")){
-        socket.emit("check", localStorage.getItem("username"), localStorage.getItem("key"))
-        request = id
+function buy(id) {
+    var keys = getKeys()
+    if (keys) {
         document.getElementById("kjopKnapp").innerHTML = "..."
-    }
-    else{
-        window.location.href= "Logg-inn.html"
+        socket.emit("buy", id, keys[0], keys[1])
     }
 }
-socket.on("allowed", () => {
-    socket.emit("buy", request, localStorage.getItem("username"))
-})
 socket.on("notAllowed", () => {
     window.location.href = "Logg-inn.html"
 });
-(function(){
+(function () {
     socket.emit("getAllColors")
 })()
 socket.on("colorsReturn", (colors) => {
-    if(colors){
+    if (colors) {
         display(colors)
     }
 })
-function display(list){
-    while(document.getElementById("colorsSelect").firstChild){
+
+function display(list) {
+    while (document.getElementById("colorsSelect").firstChild) {
         document.getElementById("colorsSelect").removeChild(document.getElementById("colorsSelect").firstChild)
     }
     var opt = document.createElement("option")
@@ -43,9 +38,13 @@ function display(list){
     }).join("")
     document.getElementById("colorsSelect").innerHTML += htmlString
 }
-document.getElementById("colorsSelect").onchange = function(){
+document.getElementById("colorsSelect").onchange = function () {
     var updatedName = document.getElementById("colorsSelect").value.split(" ").join("%20")
     var element = document.getElementById("colorsSelect")
     var price = element.options[element.selectedIndex].id
     document.getElementById("price").innerHTML = `KR ${price}-,`
+    console.log(updatedName)
+    document.getElementById("kjopKnapp").onclick = function(){
+        buy(updatedName)
+    }
 }

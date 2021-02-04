@@ -17,6 +17,7 @@ paypal.configure({
     "client_id": process.env.PAYPAL_ID, //disse to leder til "gard docs" DISSE MÅ ENDRES TIL JONNI SIN PAYPAL
     "client_secret": process.env.PAYPAL_SECRET
 })
+console.log(process.env.PAYPAL_ID)
 
 //dependecies
 const app = require("express")()
@@ -56,9 +57,9 @@ app.post("/newProduct", (req, res) => { //brukes for opplastning av nye produkt
                         "cost": +fields.cost,
                         "picFileLoc": newPath
                     }
-                    var json = jsonRead("data/products.json")
+                    var json = jsonRead("data/colors.json")
                     json.push(newObject)
-                    jsonWrite("data/products.json", json)
+                    jsonWrite("data/colors.json", json)
                 }
             })
         }
@@ -77,10 +78,10 @@ app.get("/success", (req, res) => { //paypal betalings prosess
         var payerId
         var ammount
         var execute_payment_json
-        var products = jsonRead("data/products.json")
+        var products = jsonRead("data/colors.json")
         products.forEach(product => {
-            if (product.name.replace("%20", " ") == req.query.product) {
-                ammount = product.cost
+            if (product.color.replace("%20", " ") == req.query.product) {
+                ammount = product.price
             }
         })
         if (!ammount) {
@@ -252,13 +253,13 @@ io.on("connection", (socket) => {
         }
     })
     socket.on("requestProducts", () => {
-        var json = jsonRead("data/products.json")
+        var json = jsonRead("data/colors.json")
         socket.emit("products", JSON.stringify(json))
     })
     socket.on("requestSpesificProduct", (productName) => {
-        var products = jsonRead("data/products.json")
+        var products = jsonRead("data/colors.json")
         products.forEach(product => {
-            if (product.name == productName) {
+            if (product.color == productName) {
                 socket.emit("spesificProduct", product)
             }
         })
@@ -283,50 +284,55 @@ io.on("connection", (socket) => {
             sendMail(email, "PEG UB kontakt", `hei ${name}! Vi har mottat din melding og tar kontakt med deg så fort som mulig.`)
         }
     })
-    socket.on("buy", (productName, email) => {
-        var products = jsonRead("data/products.json")
-        products.forEach(product => {
-            if (product.name == productName) {
-                var actualName = product.name.replace("%20", " ")
-                const create_payment_json = {
-                    "intent": "sale",
-                    "payer": {
-                        "payment_method": "paypal"
-                    },
-                    "redirect_urls": {
-                        "return_url": `${websiteLink}:${port}/success?product=${productName}&email=${email}`,
-                        "cancel_url": `${websiteLink}:${port}/cancel`
-                    },
-                    "transactions": [{
-                        "item_list": {
-                            "items": [{
-                                "name": actualName,
-                                "sku": "001",
-                                "price": product.cost,
+    socket.on("buy", (productName, email, key) => {
+        if (check(email, key)) {
+            var products = jsonRead("data/colors.json")
+            products.forEach(product => {
+                if (product.color == productName) {
+                    var actualName = product.color.replace("%20", " ")
+                    const create_payment_json = {
+                        "intent": "sale",
+                        "payer": {
+                            "payment_method": "paypal"
+                        },
+                        "redirect_urls": {
+                            "return_url": `${websiteLink}:${port}/success?product=${productName}&email=${email}`,
+                            "cancel_url": `${websiteLink}:${port}/cancel`
+                        },
+                        "transactions": [{
+                            "item_list": {
+                                "items": [{
+                                    "name": actualName,
+                                    "sku": "001",
+                                    "price": product.price,
+                                    "currency": "NOK",
+                                    "quantity": 1
+                                }]
+                            },
+                            "amount": {
                                 "currency": "NOK",
-                                "quantity": 1
-                            }]
-                        },
-                        "amount": {
-                            "currency": "NOK",
-                            "total": product.cost
-                        },
-                        "description": actualName
-                    }]
-                };
-                paypal.payment.create(create_payment_json, function (error, payment) {
-                    if (error) {
-                        console.error(error)
-                    } else {
-                        for (var i = 0; i < payment.links.length; i++) {
-                            if (payment.links[i].rel == "approval_url") {
-                                socket.emit("redir", payment.links[i].href)
+                                "total": product.price
+                            },
+                            "description": actualName
+                        }]
+                    };
+                    paypal.payment.create(create_payment_json, function (error, payment) {
+                        if (error) {
+                            console.error(error)
+                        } else {
+                            for (var i = 0; i < payment.links.length; i++) {
+                                if (payment.links[i].rel == "approval_url") {
+                                    socket.emit("redir", payment.links[i].href)
+                                }
                             }
                         }
-                    }
-                })
-            }
-        })
+                    })
+                }
+            })
+        }
+        else{
+            socket.emit("redir", "Logg-Inn.html")
+        }
     })
     socket.on("requestWaitingOrders", () => {
         var orders = jsonRead("data/waitingOrders.json")
@@ -497,28 +503,26 @@ io.on("connection", (socket) => {
     })
     socket.on("getAllColors", () => {
         var data = jsonRead("data/Colors.json")
-        if(data){
+        if (data) {
             socket.emit("colorsReturn", data)
         }
     })
     socket.on("removeColor", (color, username, key) => {
         var loggedin = check(username, key)
-        if(loggedin){
-            if(loggedin[0]){
+        if (loggedin) {
+            if (loggedin[0]) {
                 var colors = jsonRead("data/colors.json")
-                for(var i = 0; i<colors.length; i++){
-                    if(colors[i].color == color){
+                for (var i = 0; i < colors.length; i++) {
+                    if (colors[i].color == color) {
                         colors.splice(i, 1)
                         jsonWrite("data/colors.json", colors)
                         socket.emit("colorDeleted")
                     }
                 }
-            }
-            else{
+            } else {
                 socket.emit("redir", "/")
             }
-        }
-        else{
+        } else {
             socket.emit("redir", "Logg-Inn.html")
         }
     })
@@ -622,31 +626,30 @@ function log(msg, isErr) { //main logging function
         fs.appendFileSync("data/logs/log.log", fullMsg + "\r\n")
     }
 }
-(function(){
+(function () {
     var allFiles = [
-        ["allOrders.json","[]"],
-        ["colors.json","[]"],
+        ["allOrders.json", "[]"],
+        ["colors.json", "[]"],
         ["genInfo.json", '{"nextOrderID":0}'],
-        ["products.json", "[]"],
         ["users.json", "[]"],
-        ["waitionOrders.json", "[]"]
+        ["waitingOrders.json", "[]"]
     ]
     var statusSent = false;
-    if(!fs.existsSync("data/")){
+    if (!fs.existsSync("data/")) {
         fs.mkdirSync("data/")
         console.log("\x1b[33m%s\x1b[0m", "Opretter Database.....")
         statusSent = true;
     }
     allFiles.forEach(file => {
-        if(!fs.existsSync(`data/${file[0]}`)){
-            if(!statusSent){   
+        if (!fs.existsSync(`data/${file[0]}`)) {
+            if (!statusSent) {
                 console.log("\x1b[33m%s\x1b[0m", "Opretter Database.....")
                 statusSent = true
             }
             jsonWrite(`data/${file[0]}`, JSON.parse(file[1]))
         }
     })
-    if(statusSent){
+    if (statusSent) {
         console.log("\x1b[32m%s\x1b[0m", "Database Oprettet!")
     }
 })()
