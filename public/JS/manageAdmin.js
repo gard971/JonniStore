@@ -13,7 +13,7 @@ var socket = io();
     }
 })()
 socket.on("notAllowed", () => {
-    window.location.href = "login.html"
+    window.location.href = "Logg-Inn.html"
 })
 socket.on("allowed", (superAdmin) => {
     if (!superAdmin) {

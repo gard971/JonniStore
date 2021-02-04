@@ -28,3 +28,9 @@ function display(list){
     }).join("")
     document.getElementById("ul").innerHTML = htmlString
 }
+window.onload = function(){
+    check(true, false)
+}
+socket.on("notAllowed", () => {
+    window.location.href="Logg-Inn.html"
+})
