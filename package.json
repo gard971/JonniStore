@@ -1,5 +1,5 @@
 {
-  "name": "jonnistore",
+  "name": "pegub.com",
   "version": "1.0.0",
   "description": "Jonni sin butikk",
   "main": "index.js",
@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/gard971/JonniStore.git"
   },
-  "author": "Gard Søreng (JS)",
+  "author": "Gard Søreng",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/gard971/JonniStore/issues"
@@ -18,6 +18,7 @@
   "homepage": "https://github.com/gard971/JonniStore#readme",
   "dependencies": {
     "bcrypt": "^5.0.0",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "formidable": "^1.2.2",
     "fs": "0.0.1-security",

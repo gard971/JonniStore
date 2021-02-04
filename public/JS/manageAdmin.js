@@ -1,3 +1,4 @@
+
 var socket = io();
 
 (function () {
@@ -6,6 +7,9 @@ var socket = io();
     }
     else if (localStorage.getItem("username") && localStorage.getItem("key")) {
         socket.emit("check", localStorage.getItem("username"), localStorage.getItem("key"), true, true)
+    }
+    else{
+        window.location.href="index.html"
     }
 })()
 socket.on("notAllowed", () => {
@@ -20,7 +24,13 @@ socket.on("allowed", (superAdmin) => {
         document.getElementById("newAdminForm").style.display = "inline"
         document.getElementById("newAdminForm").addEventListener("submit", (e) => {
             e.preventDefault()
-            socket.emit("getUsers", document.getElementById("searchBar").value)
+            var keys = getKeys()
+            if(keys){
+                socket.emit("getUsers", document.getElementById("searchBar").value, keys[0], keys[1])
+            }
+            else{
+                window.location.href="Logg-Inn.html"
+            }
         })
     }
 })
@@ -28,22 +38,39 @@ socket.on("allowed", (superAdmin) => {
 socket.on("userReturn", users =>{
     display(users)
 })
+socket.on("adminAdded", () =>{
+    alert("administrator lagt til")
+    var keys = getKeys()
+    if(keys){
+        socket.emit("getUsers", document.getElementById("searchBar").value, keys[0], keys[1])
+    }
+    else{
+        window.location.href="Logg-Inn.html"
+    }
+})
+socket.on("adminRemoved", () => {
+    alert("administrator fjernet")
+    var keys = getKeys()
+    if(keys){
+        socket.emit("getUsers", document.getElementById("searchBar").value, keys[0], keys[1])
+    }
+    else{
+        window.location.href="Logg-Inn.html"
+    }
+})
 function display(list){
     while(document.getElementById("ul").firstChild){
         document.getElementById("ul").removeChild(document.getElementById("ul").firstChild)
     }
     var htmlString = list.map(object => {
         return `
-            <div class="adressWrapper" onclick="redir('/info.html?id=${object.id}')">
                 <li>
-                    <p class="newEmail">${object.username}</p>
+                    <p class="newEmail admin${object.isAdmin}">${object.username}</p>
                 </li>
-            </div>
         `
     }).join("")
     document.getElementById("ul").innerHTML = htmlString
     var test = document.getElementsByClassName("newEmail")
-    console.log(test)
     window.onmousemove = function (e) {
         var x = e.clientX,
             y = e.clientY;
@@ -58,6 +85,55 @@ function display(list){
         elements[i].onmouseenter = function (e) {
             document.getElementById("tooltip").style.display = "inline"
         }
+        console.log(elements[i])
+        elements[i].onclick = function(){
+            addAdmin(this.innerHTML)
+        }
     }
-
+    var nonAdminElems = document.getElementsByClassName("admintrue")
+    for(var i = 0; i<nonAdminElems.length; i++){
+        nonAdminElems[i].onmouseenter = function(e){
+            document.getElementById("tooltip").style.display = "inline"
+            document.getElementById("tooltip").innerHTML = "Trykk for å fjerne administrator"
+        }
+        nonAdminElems[i].onmouseleave = function(e){
+            document.getElementById("tooltip").style.display = "none"
+            document.getElementById("tooltip").innerHTML = "Trykk for å legge til som admin"
+        }
+        var email = nonAdminElems[i].innerHTML
+        nonAdminElems[i].onclick  = function(){
+            removeAdmin(email)
+        }
+    }
+    var elemWidth = document.getElementById("newAdminList").offsetWidth
+    var marg = elemWidth/2;
+    document.getElementById("newAdminList").style.marginLeft = `-${marg}`
+}
+function addAdmin(email){
+    var keys = getKeys()
+    var username
+    var key
+    if(keys){
+        username = keys[0]
+        key = keys[1]
+    }
+    else{
+        window.location.href="Logg-Inn.html"
+        return
+    }
+    socket.emit("addAdmin", username, key, email)
+}
+function removeAdmin(email){
+    var keys = getKeys()
+    var username
+    var key
+    if(keys){
+        username = keys[0]
+        key = keys[1]
+    }
+    else{
+        window.location.href="Logg-Inn.html"
+        return
+    }
+    socket.emit("removeAdmin", username, key, email)
 }

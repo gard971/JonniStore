@@ -10,5 +10,17 @@
     position: absolute;
     left:50%;
     top:5%;
-    margin-left:-82.4px;
+    margin-left:-88px;
+}
+#ul{
+    list-style: none;
+    padding: 0;
+}
+#newAdminList{
+    position: absolute;
+    top:10%;
+    left:50%;
+}
+.newEmail{
+    cursor: pointer;
 }

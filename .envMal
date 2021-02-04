@@ -1,0 +1,24 @@
+# BE-BU-BE-BU FØLG MED!!!!! ENDRE FILNAVN PÅ DENNE FILEN TIL: .env ELLERS VIL DET IKKE FUNKE
+
+
+#porten sett til 80 for normal bruk, 3000 for testing
+PORT=3000
+
+# ignorer
+SALT=10
+
+#email navn og APP passord
+EMAIL=changeme
+EMAILPASSWORD=changeme
+
+# Domenenav eksempelvis: http://pegub.com
+DOMAIN=http://localhost
+
+# ignorer:
+USELOGS=true
+
+# paypalVariabler:
+
+PAYPAL_MODE=sandbox
+PAYPAL_ID=AeY4EnVK7UJ_2AxR66cY_zXDrOAHjZq0TLVqnkpFY6BkwrOvdMXF9sYl44MAPcREP7ccuY
+PAYPAL_SECRET=EAqK2uTsxgJVVWD3Gy1JWIWvoDqJVMHf9s9yIWsbsSM 

@@ -1,10 +1,7 @@
 var socket = io()
-console.log($("#loginForm"))
 $("#loginForm").on("submit", function(e) {
     e.preventDefault();
-    console.log("sent")
     if($("#email-4b87").val() != "" || $("#message-4b87").val() != ""){
-        console.log($("#message-4b87").val())
         socket.emit("login", $("#email-4b87").val(), $("#message-4b87").val())
     }
 })

@@ -102,8 +102,11 @@ socket.on("PDF", href => {
 })
 
 function shipped(id, item) {
-    socket.emit("ItemShipped", id)
-    document.getElementById("AllOrders").removeChild(item)
+    var keys = getKeys()
+    if(keys){  
+        socket.emit("ItemShipped", id, keys[0], keys[1])
+        document.getElementById("AllOrders").removeChild(item)
+    }
 }
 
 function getPDF(id) {
