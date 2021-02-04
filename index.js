@@ -622,3 +622,31 @@ function log(msg, isErr) { //main logging function
         fs.appendFileSync("data/logs/log.log", fullMsg + "\r\n")
     }
 }
+(function(){
+    var allFiles = [
+        ["allOrders.json","[]"],
+        ["colors.json","[]"],
+        ["genInfo.json", '{"nextOrderID":0}'],
+        ["products.json", "[]"],
+        ["users.json", "[]"],
+        ["waitionOrders.json", "[]"]
+    ]
+    var statusSent = false;
+    if(!fs.existsSync("data/")){
+        fs.mkdirSync("data/")
+        console.log("\x1b[33m%s\x1b[0m", "Opretter Database.....")
+        statusSent = true;
+    }
+    allFiles.forEach(file => {
+        if(!fs.existsSync(`data/${file[0]}`)){
+            if(!statusSent){   
+                console.log("\x1b[33m%s\x1b[0m", "Opretter Database.....")
+                statusSent = true
+            }
+            jsonWrite(`data/${file[0]}`, JSON.parse(file[1]))
+        }
+    })
+    if(statusSent){
+        console.log("\x1b[32m%s\x1b[0m", "Database Oprettet!")
+    }
+})()
