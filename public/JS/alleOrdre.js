@@ -28,9 +28,10 @@ function display(list){
     }).join("")
     document.getElementById("ul").innerHTML = htmlString
 }
-window.onload = function(){
+(function(){
+    console.log("check")
     check(true, false)
-}
+})()
 socket.on("notAllowed", () => {
     window.location.href="Logg-Inn.html"
 })
