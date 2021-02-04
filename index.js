@@ -22,10 +22,16 @@ paypal.configure({
 const app = require("express")()
 const express = require("express")
 const fs = require("fs")
-const http = require("http").createServer(app).listen(port, () => {
+
+var options = {
+    key: fs.readFileSync("private.pem"),
+    cert: fs.readFileSync("certificate.pem")
+}
+
+const https = require("https").createServer(options, app).listen(port, () => {
     console.log(`server listening on port: ${port}`)
 })
-const io = require("socket.io")(http)
+const io = require("socket.io")(https)
 const path = require("path")
 const bcrypt = require("bcrypt")
 const nodemailer = require("nodemailer")
