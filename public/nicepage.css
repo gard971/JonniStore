@@ -30773,7 +30773,7 @@ a.u-link.u-text-hover-grey-90:hover {
   margin:0;
 }
 
-@media(max-width:1156px){
+@media(max-width:1246px){
   #prototype1{
     visibility: hidden;
   }
@@ -30806,7 +30806,11 @@ a.u-link.u-text-hover-grey-90:hover {
     display: none;
   }
 }
-
+@media(max-width:1613px){
+  #prototype1{
+    right:83%;
+  }
+}
 @media(max-width:1538px){
     #prototype2{
       left:85%;
@@ -30815,12 +30819,17 @@ a.u-link.u-text-hover-grey-90:hover {
       right:85%;
     }
 }
-@media(min-width:1200px) and (max-width:1300px){
+@media(min-width:1300px) and (max-width:1429px){
   #prototype2{
     left:80%;
   }
   #prototype1{
     right:85%;
+  }
+}
+@media(max-width:1300px){
+  #prototype2{
+    left:77%;
   }
 }
 #tiktokVideo{
